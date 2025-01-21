@@ -22,7 +22,7 @@ const listTransactions = async (req, res) => {
     $or: [
       { title: new RegExp(search, 'i') },
       { description: new RegExp(search, 'i') },
-      { price: { $regex: search } },
+      ...(isNaN(search) ? [] : [{ price: Number(search) }]),
     ],
   };
 
@@ -38,28 +38,24 @@ const listTransactions = async (req, res) => {
 };
 
 // Get statistics for a month
-const getStatistics = async (req, res) => {
-  const { month } = req.query;
-  const monthIndex = new Date(`${month} 1, 2000`).getMonth();
+const getStatisticsData = async (month) => {
+  const currentYear = new Date().getFullYear();
+  const monthIndex = new Date(`${month} 1, ${currentYear}`).getMonth();
 
-  try {
-    const transactions = await Transaction.find({
-      dateOfSale: { $gte: new Date(2000, monthIndex, 1), $lt: new Date(2000, monthIndex + 1, 1) },
-    });
-    const totalSale = transactions.reduce((sum, t) => sum + (t.sold ? t.price : 0), 0);
-    const soldItems = transactions.filter((t) => t.sold).length;
-    const notSoldItems = transactions.filter((t) => !t.sold).length;
+  const transactions = await Transaction.find({
+    dateOfSale: { $gte: new Date(currentYear, monthIndex, 1), $lt: new Date(currentYear, monthIndex + 1, 1) },
+  });
+  const totalSale = transactions.reduce((sum, t) => sum + (t.sold ? t.price : 0), 0);
+  const soldItems = transactions.filter((t) => t.sold).length;
+  const notSoldItems = transactions.filter((t) => !t.sold).length;
 
-    res.status(200).json({ totalSale, soldItems, notSoldItems });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  return { totalSale, soldItems, notSoldItems };
 };
 
 // Bar chart data
-const getBarChartData = async (req, res) => {
-  const { month } = req.query;
-  const monthIndex = new Date(`${month} 1, 2000`).getMonth();
+const getBarChartData = async (month) => {
+  const currentYear = new Date().getFullYear();
+  const monthIndex = new Date(`${month} 1, ${currentYear}`).getMonth();
   const ranges = [
     [0, 100],
     [101, 200],
@@ -73,50 +69,39 @@ const getBarChartData = async (req, res) => {
     [901, Infinity],
   ];
 
-  try {
-    const transactions = await Transaction.find({
-      dateOfSale: { $gte: new Date(2000, monthIndex, 1), $lt: new Date(2000, monthIndex + 1, 1) },
-    });
+  const transactions = await Transaction.find({
+    dateOfSale: { $gte: new Date(currentYear, monthIndex, 1), $lt: new Date(currentYear, monthIndex + 1, 1) },
+  });
 
-    const barChartData = ranges.map(([min, max]) => ({
-      range: `${min}-${max}`,
-      count: transactions.filter((t) => t.price >= min && t.price <= max).length,
-    }));
-
-    res.status(200).json(barChartData);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  return ranges.map(([min, max]) => ({
+    range: `${min}-${max}`,
+    count: transactions.filter((t) => t.price >= min && t.price <= max).length,
+  }));
 };
 
 // Pie chart data
-const getPieChartData = async (req, res) => {
-  const { month } = req.query;
-  const monthIndex = new Date(`${month} 1, 2000`).getMonth();
+const getPieChartData = async (month) => {
+  const currentYear = new Date().getFullYear();
+  const monthIndex = new Date(`${month} 1, ${currentYear}`).getMonth();
 
-  try {
-    const transactions = await Transaction.find({
-      dateOfSale: { $gte: new Date(2000, monthIndex, 1), $lt: new Date(2000, monthIndex + 1, 1) },
-    });
+  const transactions = await Transaction.find({
+    dateOfSale: { $gte: new Date(currentYear, monthIndex, 1), $lt: new Date(currentYear, monthIndex + 1, 1) },
+  });
 
-    const pieChartData = transactions.reduce((acc, t) => {
-      acc[t.category] = (acc[t.category] || 0) + 1;
-      return acc;
-    }, {});
-
-    res.status(200).json(pieChartData);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  return transactions.reduce((acc, t) => {
+    acc[t.category] = (acc[t.category] || 0) + 1;
+    return acc;
+  }, {});
 };
 
 // Combined API
 const getCombinedData = async (req, res) => {
+  const { month } = req.query;
   try {
     const [statistics, barChartData, pieChartData] = await Promise.all([
-      getStatistics(req, res),
-      getBarChartData(req, res),
-      getPieChartData(req, res),
+      getStatisticsData(month),
+      getBarChartData(month),
+      getPieChartData(month),
     ]);
     res.status(200).json({ statistics, barChartData, pieChartData });
   } catch (err) {
@@ -127,7 +112,7 @@ const getCombinedData = async (req, res) => {
 module.exports = {
   initializeDatabase,
   listTransactions,
-  getStatistics,
+  getStatisticsData,
   getBarChartData,
   getPieChartData,
   getCombinedData,
