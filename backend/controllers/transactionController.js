@@ -1,18 +1,30 @@
 const axios = require('axios');
 const Transaction = require('../models/Transaction');
 
+const DATABASE_URL = 'https://s3.amazonaws.com/roxiler.com/product_transaction.json';
+
 // Initialize database
 const initializeDatabase = async (req, res) => {
   try {
-    const { data } = await axios.get(
-      'https://s3.amazonaws.com/roxiler.com/product_transaction.json'
-    );
+    // Fetch data from the external URL
+    const { data } = await axios.get(DATABASE_URL);
+
+    // Validate the fetched data
+    if (!Array.isArray(data)) {
+      throw new Error('Fetched data is not in the expected format (array).');
+    }
+
+    // Clear the existing database collection
     await Transaction.deleteMany();
+
+    // Insert the new data
     await Transaction.insertMany(data);
+
+    // Respond with success
     res.status(200).json({ message: 'Database initialized successfully!' });
   } catch (err) {
-    console.error('Error initializing database:', err.message);
-    res.status(500).json({ error: err.message });
+    console.error('Error initializing database:', err.stack);
+    res.status(500).json({ error: 'Failed to initialize the database. ' + err.message });
   }
 };
 
