@@ -1,0 +1,179 @@
+/* General Styles */
+body {
+  font-family: 'Roboto', Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f9f9f9;
+  color: #333;
+}
+
+.app-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Header */
+h1 {
+  text-align: center;
+  color: #4CAF50;
+  margin-bottom: 30px;
+}
+
+/* Controls */
+.controls {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.controls select {
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #fff;
+  color: #333;
+  cursor: pointer;
+}
+
+.controls select:focus {
+  outline: none;
+  border-color: #4CAF50;
+}
+
+/* Statistics Box */
+.statistics-box {
+  display: flex;
+  justify-content: space-around;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin: 20px 0;
+}
+
+.statistics-box div {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* Transactions Table */
+.transactions-table {
+  margin-top: 20px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden; /* Prevent excessive scrolling */
+}
+
+/* Search Wrapper */
+.search-wrapper {
+  padding: 10px;
+  display: flex;
+  justify-content: center; /* Align the search bar to the center */
+}
+
+.search-wrapper input {
+  width: 300px;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+/* Table Wrapper */
+.transactions-table .table-wrapper {
+  overflow-x: auto; /* Enable horizontal scrolling only if needed */
+}
+
+.transactions-table table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 800px; /* Ensure proper table structure for smaller screens */
+}
+
+.transactions-table th,
+.transactions-table td {
+  border: 1px solid #ddd;
+  text-align: center;
+  padding: 10px;
+}
+
+.transactions-table th {
+  background-color: #4CAF50;
+  color: #fff;
+  font-weight: bold;
+}
+
+.transactions-table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.transactions-table tbody tr:hover {
+  background-color: #f1f1f1;
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px 0;
+}
+
+.pagination button {
+  padding: 10px 20px;
+  margin: 0 5px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  background-color: #4CAF50;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.pagination button:hover {
+  background-color: #45a049;
+}
+
+.pagination span {
+  font-size: 16px;
+  margin: 0 10px;
+}
+
+/* Bar Chart */
+.bar-chart {
+  margin-top: 20px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .statistics-box {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .controls {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .search-wrapper {
+    justify-content: center; /* Center-align search bar on smaller screens */
+  }
+
+  .transactions-table .table-wrapper {
+    overflow-x: scroll;
+  }
+
+  .transactions-table table {
+    min-width: 600px; /* Ensure table stays readable */
+  }
+}
