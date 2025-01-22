@@ -15,6 +15,7 @@ import {
 
 Chart.register(CategoryScale, LinearScale, BarElement, Title, Tooltip);
 
+
 const BASE_URL = "http://localhost:5000/api";
 
 const App = () => {
